@@ -1,0 +1,157 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Frame name="minihealerHealbar" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="false">
+		<Size><AbsDimension x="196" y="23"/></Size> 	
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="CastingBarFrame" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="30"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+        <!-- Border -->
+		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="minihealerHealbarText" inherits="GameFontHighlightSmall" text="no target">
+                    <Size>
+                        <AbsDimension x="196" y="16"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeTo="minihealerHealbar" relativePoint="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="1"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+
+		<Frames>
+            <!-- Health statusbar (before heal) -->
+			<StatusBar name="minihealerHealbarStatusbar">
+				<Size>
+					<AbsDimension x="186" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+                    <Layer level="OVERLAY">
+                        <Texture name="minihealerHealbarSpark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
+                            <Size>
+                                <AbsDimension x="16" y="30"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="CENTER"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+                        this:SetMinMaxValues(0,1);
+                        this:SetValue(0.5);
+						this:SetFrameLevel(this:GetFrameLevel() - 1)
+					</OnLoad>
+				</Scripts>
+				<BarTexture name="minihealerHealbarTexture" file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="0.0" g="1.0" b="0.0"/>
+			</StatusBar>
+            <!-- Heal statusbar (after heal) -->
+			<StatusBar name="minihealerHealbarStatusbarPost">
+				<Size>
+					<AbsDimension x="372" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                <Layer level="BACKGROUND">
+                    <Texture name="minihealerHealbarBackground">
+                        <Size>
+                            <AbsDimension x="186" y="15"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Color r="0" g="0" b="0" a="0.5"/>
+                    </Texture>		
+                </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+                        this:SetMinMaxValues(0,2);
+                        this:SetValue(1);
+						this:SetFrameLevel(this:GetFrameLevel() - 2)
+					</OnLoad>
+				</Scripts>
+				<BarTexture name="minihealerHealbarPostTexture" file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="0.0" g="1.0" b="0.0"/>
+			</StatusBar>
+		</Frames>
+		<Scripts>
+ 			<OnMouseDown>
+ 				if arg1 == "LeftButton" then
+ 					this:StartMoving();
+ 				end
+ 			</OnMouseDown>
+ 			<OnMouseUp>
+                if (arg1 == "LeftButton") then
+                    this:StopMovingOrSizing();
+                end
+ 			</OnMouseUp>
+            <OnEnter>
+                if QuickHealConfig:IsVisible() then
+                    GameTooltip:SetOwner(this,"ANCHOR_TOPLEFT");
+                    GameTooltip:SetText("Healing Bar Configuration\nLeft-click to drag.\nRight-click to re-attach to Casting Bar.");
+                    this.tooltipShown = true;
+                end
+            </OnEnter>
+            <OnLeave>
+                GameTooltip:Hide();
+                this.tooltipShown = false;
+            </OnLeave>
+		</Scripts>
+	</Frame>
+
+    <!-- Overheal status label -->
+    <Frame name="minihealerOverhealStatus" parent="UIParent" hidden="true">
+        <Size> <AbsDimension x="300" y="13"/> </Size>
+        <Anchors> <Anchor point="CENTER" relativeTo="minihealerHealbar" relativePoint="CENTER"><Offset><AbsDimension x="0" y="10"/></Offset></Anchor></Anchors>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parent_Text" outline="NORMAL" inherits="GameFontNormal" text="">
+                    <Anchors><Anchor point="BOTTOM" relativePoint="TOP"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor></Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+</Ui>

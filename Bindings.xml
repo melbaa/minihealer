@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="MINIHEALER_HEAL" header="MINIHEALER">
+        if MINIHEALER_LOADED then miniheal() end
+	</Binding>
+</Bindings>

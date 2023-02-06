@@ -1,0 +1,8 @@
+## Interface: 11200
+## Title: minihealer
+## Notes: none
+## Author: melba
+## SavedVariables: minihealer_variables
+## SavedVariablesPerCharacter: minihealer_variables_pc
+minihealer.lua
+healbar.xml
