@@ -228,6 +228,16 @@ end
 
 
 
+local function UnitFullName(unit)
+    local name, server = UnitName(unit);
+    if server and type(server) == "string" and type(name) == "string" then
+        return name .. " of " .. server;
+    else
+        return name;
+    end
+end
+
+
 
 local function ExplainFalseUnitCondition(unit, condition, debugText, explain)
     if condition then
