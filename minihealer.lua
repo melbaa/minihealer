@@ -21,10 +21,20 @@ local healingTarget = nil
 local healingTargetMissing = 0
 local DEBUG_ENABLED = true
 local me = UnitName('player')
+local myclass = string.lower(UnitClass('player'))
 
+local spell_per_class = {
+    priest='Flash Heal',
+    paladin='Flash of Light',
+}
+
+
+
+local healspell = spell_per_class[myclass]
 
 BINDING_HEADER_MINIHEALER = 'minihealer'
 BINDING_NAME_MINIHEALER_HEAL = 'Heal'
+
 
 
 
@@ -128,6 +138,7 @@ function minihealer:OnEnable()
 
     assert(SmartHealer, 'dependency not found')
     assert(pfUI.api.libpredict.UnitGetIncomingHeals, 'dependency not found')
+    assert(healspell, 'healspell for class' .. myclass .. ' not found')
 
     self:RegisterEvent("UI_ERROR_MESSAGE")
 
@@ -541,7 +552,7 @@ function miniheal(healingTarget)
 
     StartMonitor(healingTarget)
     -- CastSpellByName(msg)
-    SmartHealer:CastHeal('Flash Heal')
+    SmartHealer:CastHeal(healspell)
 
     -- reset healing target
     if oldt then
