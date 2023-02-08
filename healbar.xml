@@ -54,28 +54,18 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<Layers>
-                    <Layer level="OVERLAY">
-                        <Texture name="minihealerHealbarSpark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
-                            <Size>
-                                <AbsDimension x="16" y="30"/>
-                            </Size>
-                            <Anchors>
-                                <Anchor point="CENTER"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-				</Layers>
-				<Scripts>
+                <Scripts>
 					<OnLoad>
                         this:SetMinMaxValues(0,1);
-                        this:SetValue(0.5);
+                        this:SetValue(0);
 						this:SetFrameLevel(this:GetFrameLevel() - 1)
 					</OnLoad>
 				</Scripts>
 				<BarTexture name="minihealerHealbarTexture" file="Interface\TargetingFrame\UI-StatusBar"/>
-                <BarColor r="0.0" g="1.0" b="0.0"/>
+                <BarColor r="1.0" g="1.0" b="1.0"/>
 			</StatusBar>
+
+
             <!-- Heal statusbar (after heal) -->
 			<StatusBar name="minihealerHealbarStatusbarPost">
 				<Size>
@@ -108,7 +98,7 @@
 				<Scripts>
 					<OnLoad>
                         this:SetMinMaxValues(0,2);
-                        this:SetValue(1);
+                        this:SetValue(0);
 						this:SetFrameLevel(this:GetFrameLevel() - 2)
 					</OnLoad>
 				</Scripts>
@@ -127,7 +117,8 @@
                     this:StopMovingOrSizing();
                 end
  			</OnMouseUp>
-            <OnEnter>
+
+            <!-- <OnEnter>
                 if QuickHealConfig:IsVisible() then
                     GameTooltip:SetOwner(this,"ANCHOR_TOPLEFT");
                     GameTooltip:SetText("Healing Bar Configuration\nLeft-click to drag.\nRight-click to re-attach to Casting Bar.");
@@ -137,7 +128,7 @@
             <OnLeave>
                 GameTooltip:Hide();
                 this.tooltipShown = false;
-            </OnLeave>
+            </OnLeave> -->
 		</Scripts>
 	</Frame>
 

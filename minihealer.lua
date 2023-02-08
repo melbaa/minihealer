@@ -5,8 +5,8 @@ minihealer:RegisterDefaults("char", {
     ["RatioForSelf"] = 0.9, --less than this activates self preservation
     ["RatioFull"] = 0.9, -- don't heal with too little missing
     ["FlatForSelf"] = 500,
-    -- ["FlatFromFull"] = 500,
-    ["FlatFromFull"] = -1,
+    ["FlatFromFull"] = 500,
+    -- ["FlatFromFull"] = -1,
     ["TargetPriority"] = false, -- prioritize focused target?
 })
 
@@ -18,6 +18,7 @@ local lastBlacklistTime = 0;
 local blacklistDuration = 5
 
 local healingTarget = nil
+local healingTargetMissing = 0
 local DEBUG_ENABLED = true
 local me = UnitName('player')
 
@@ -69,16 +70,32 @@ local function colorize(txt, prependAppName)
 end
 
 
-local function GetIncomingHeals(unit)
-   return pfUI.api.libpredict:UnitGetIncomingHeals(unit) or libHealComm:getHeal(unit)
-end
-
 local function sayd(msg)
     if not DEBUG_ENABLED then
         return
     end
     minihealer:Print(colorize("@Y" .. msg))
 end
+
+
+local function GetIncomingHeals(healingTarget)
+
+
+    local name = UnitName(healingTarget)
+    local healcommincoming = libHealComm:getHeal(name)
+    if healcommincoming then
+        sayd('healcommincoming ' .. healcommincoming)
+        return healcommincoming
+    end
+
+    local pfincoming = pfUI.api.libpredict:UnitGetIncomingHeals(healingTarget)
+    if pfincoming then
+        sayd('pfincoming ' .. pfincoming)
+        return pfincoming
+    end
+    return 0
+end
+
 
 local function display(msg)
     if MikSBT.DisplayMessage then
@@ -195,7 +212,7 @@ end
 
 
 local function PredictedHealthMissing(healingTarget)
-    return UnitHealthMax(healingTarget) - UnitHealth(healingTarget) + GetIncomingHeals(healingTarget)
+    return UnitHealthMax(healingTarget) - (UnitHealth(healingTarget) + GetIncomingHeals(healingTarget))
 end
 
 
@@ -428,31 +445,68 @@ end
 
 
 
+local function UpdateHealbar(healingTarget)
+    local hp = UnitHealth(healingTarget)
+    local hpmax = UnitHealthMax(healingTarget)
+    local hpincoming = GetIncomingHeals(healingTarget)
+
+    minihealerHealbarStatusbar:SetValue(hp/hpmax)
+    minihealerHealbarStatusbarPost:SetValue((hp+hpincoming)/hpmax)
+
+    local missing = hpmax - (hp + hpincoming)
+    local realmissing = hpmax - hp
+    minihealerHealbarText:SetText(''
+    .. realmissing .. ' | '
+    .. missing .. ' | '
+    .. UnitFullName(healingTarget))
+
+    -- TODO update colors and spark
+end
+
 
 local function StartMonitor(healingTarget)
+    minihealer:RegisterEvent("CHAT_MSG_ADDON") -- for detecting overheal
     minihealer:RegisterEvent("UNIT_HEALTH"); -- For detecting overheal situations
     minihealer:RegisterEvent("SPELLCAST_STOP"); -- For detecting spellcast stop
     minihealer:RegisterEvent("SPELLCAST_FAILED"); -- For detecting spellcast stop
     minihealer:RegisterEvent("SPELLCAST_INTERRUPTED"); -- For detecting spellcast stop
 
-    minihealerHealbarText:SetText("healing " .. UnitFullName(healingTarget))
+    UpdateHealbar(healingTarget)
 end
 
+
+local function ResetHealbar()
+    minihealerHealbarText:SetText("no target")
+    minihealerHealbarStatusbar:SetValue(0)
+    minihealerHealbarStatusbarPost:SetValue(0)
+end
 
 local function StopMonitor()
+    ResetHealbar()
+
     healingTarget = nil
-    minihealerHealbarText:SetText("no target")
+
+    -- TODO maybe unregister events? does the performance matter?
 end
+
+function minihealer:CHAT_MSG_ADDON()
+    if not healingTarget then return end
+    if arg1 ~= 'HealComm' then return end
+
+    sayd('1: ' .. arg1 .. ' 2: ' .. arg2 .. ' 3: ' .. arg3 .. ' 4: ' .. arg4)
+    UpdateHealbar(healingTarget)
+end
+
 
 function minihealer:UNIT_HEALTH(arg1)
-    if not UnitIsUnit(healingTarget, arg1) then
-        return
-    end
+    if not healingTarget then return end
+    if not arg1 then return end
+    if not UnitIsUnit(healingTarget, arg1) then return end
 
-    -- TODO update status bar
+    UpdateHealbar(healingTarget)
 end
 
-function minihealer:SPELLCAST_STOP(arg1)
+function minihealer:SPELLCAST_STOP()
     StopMonitor()
 end
 
