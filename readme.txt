@@ -7,6 +7,7 @@ Blacklists people out of range and not in line of sight for a few seconds.
 
 How to use:
 In the Keybinds menu, find the minihealer section and set a Heal bind.
+The /minihealer command shows extra settings.
 
 Dependencies:
 Mik's scrolling battle text https://github.com/AtheneGenesis/Vanilla_MikScrollingBattleText/

@@ -108,7 +108,7 @@
 		</Frames>
 		<Scripts>
  			<OnMouseDown>
- 				if arg1 == "LeftButton" then
+ 				if not minihealer.db.char.HealthbarLocked and arg1 == "LeftButton" then
  					this:StartMoving();
  				end
  			</OnMouseDown>

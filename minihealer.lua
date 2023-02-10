@@ -8,6 +8,7 @@ minihealer:RegisterDefaults("char", {
     ["FlatFromFull"] = 500,
     -- ["FlatFromFull"] = -1,
     ["TargetPriority"] = false, -- prioritize focused target?
+    ["HealthbarLocked"] = false, -- can we move the healthbar?
 })
 
 local libHealComm = AceLibrary("HealComm-1.0")
@@ -38,9 +39,7 @@ BINDING_NAME_MINIHEALER_HEAL = 'Heal'
 
 
 
-function miniheal_cmd(args)
 
-end
 
 
 
@@ -126,15 +125,43 @@ local function sayc(msg)
 end
 
 
+local function print_usage()
+    sayc('usage: ')
+    sayc('minihealer lock - disable moving the healing bar')
+    sayc('minihealer unlock - enable moving the healing bar')
+end
+
+
+function minihealer:cmd(arg)
+
+    local commandlist = { }
+    local command
+
+    for command in string.gfind(arg, "[^ ]+") do
+        table.insert(commandlist, command)
+    end
+
+    if commandlist[1] == nil then
+        print_usage()
+        return
+    end
+
+    commandlist[1] = string.lower(commandlist[1])
+
+
+    if commandlist[1] == 'lock' then
+        self.db.char.HealthbarLocked = true
+        sayc("Healthbar position locked")
+    elseif commandlist[1] == 'unlock' then
+        self.db.char.HealthbarLocked = false
+        sayc("Healthbar position unlocked")
+    else
+        sayc("unknown command")
+    end
+end
+
+
 function minihealer:OnEnable()
-
-    SlashCmdList["MINIHEALER"] = miniheal_cmd
-    SLASH_MINIHEALER1 = "/mh";
-    SLASH_MINIHEALER2 = "/miniheal";
-
-    --Register for Addon message event
-    -- minihealer:RegisterEvent("CHAT_MSG_ADDON")
-
 
     assert(SmartHealer, 'dependency not found')
     assert(pfUI.api.libpredict.UnitGetIncomingHeals, 'dependency not found')
@@ -142,6 +169,11 @@ function minihealer:OnEnable()
 
     self:RegisterEvent("UI_ERROR_MESSAGE")
 
+    self:RegisterChatCommand(
+        { "/minihealer" },
+        function(arg) minihealer:cmd(arg) end,
+        "MINIHEALER"
+    )
     MINIHEALER_LOADED = true
     sayc("loaded")
 end
