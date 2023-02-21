@@ -11,8 +11,8 @@ minihealer:RegisterDefaults("char", {
     ["HealthbarLocked"] = false, -- can we move the healthbar?
 })
 
+local L = AceLibrary("AceLocale-2.2"):new("MiniHealer")
 local libHealComm = AceLibrary("HealComm-1.0")
-
 
 local blacklist = {}
 local lastBlacklistTime = 0;
@@ -25,26 +25,11 @@ local me = UnitName('player')
 local myclass = string.lower(UnitClass('player'))
 
 local spell_per_class = {
-    priest='Flash Heal',
-    paladin='Flash of Light',
+    priest = L['Flash Heal'],
+    paladin = L['Flash of Light'],
 }
 
-
-
 local healspell = spell_per_class[myclass]
-
-BINDING_HEADER_MINIHEALER = 'minihealer'
-BINDING_NAME_MINIHEALER_HEAL = 'Heal'
-
-
-
-
-
-
-
-
-
-
 
 local function strToArray(s)
     s = string.lower(s.." ")
@@ -126,9 +111,9 @@ end
 
 
 local function print_usage()
-    sayc('usage: ')
-    sayc('minihealer lock - disable moving the healing bar')
-    sayc('minihealer unlock - enable moving the healing bar')
+    sayc(L['usage: '])
+    sayc(L['minihealer lock - disable moving the healing bar'])
+    sayc(L['minihealer unlock - enable moving the healing bar'])
 end
 
 
@@ -151,21 +136,21 @@ function minihealer:cmd(arg)
 
     if commandlist[1] == 'lock' then
         self.db.char.HealthbarLocked = true
-        sayc("Healthbar position locked")
+        sayc(L["Healthbar position locked"])
     elseif commandlist[1] == 'unlock' then
         self.db.char.HealthbarLocked = false
-        sayc("Healthbar position unlocked")
+        sayc(L["Healthbar position unlocked"])
     else
-        sayc("unknown command")
+        sayc(L["unknown command"])
     end
 end
 
 
 function minihealer:OnEnable()
 
-    assert(SmartHealer, 'dependency not found')
-    assert(pfUI.api.libpredict.UnitGetIncomingHeals, 'dependency not found')
-    assert(healspell, 'healspell for class' .. myclass .. ' not found')
+    assert(SmartHealer, L['dependency not found'])
+    assert(pfUI.api.libpredict.UnitGetIncomingHeals, L['dependency not found'])
+    assert(healspell, L['healspell for class '] .. myclass .. L[' not found'])
 
     self:RegisterEvent("UI_ERROR_MESSAGE")
 
@@ -175,7 +160,7 @@ function minihealer:OnEnable()
         "MINIHEALER"
     )
     MINIHEALER_LOADED = true
-    sayc("loaded")
+    sayc(L["loaded"])
 end
 
 local function IsBlacklisted(unitname)
@@ -217,7 +202,7 @@ local function UnitHasHealthInfo(unit)
     local i;
 
     if not unit then
-        sayd('no unit selected for health info?')
+        sayd(L['no unit selected for health info?'])
         return false
     end
 
@@ -287,33 +272,33 @@ end
 
 -- Return true if the unit is healable by player
 function minihealer:UnitIsHealable(unit, explain)
-    if ExplainFalseUnitCondition(unit, UnitExists(unit), 'does not exist') then
+    if ExplainFalseUnitCondition(unit, UnitExists(unit), L['does not exist']) then
         return false
     end
-    if ExplainFalseUnitCondition(unit, UnitIsFriend('player', unit), "is not a friend", explain) then
+    if ExplainFalseUnitCondition(unit, UnitIsFriend('player', unit), L["is not a friend"], explain) then
         return false
     end
-    if ExplainFalseUnitCondition(unit, not UnitIsEnemy(unit, 'player'), "is an enemy", explain) then
+    if ExplainFalseUnitCondition(unit, not UnitIsEnemy(unit, 'player'), L["is an enemy"], explain) then
         return false
     end
-    if ExplainFalseUnitCondition(unit, not UnitCanAttack('player', unit), "can be attacked by player", explain) then
+    if ExplainFalseUnitCondition(unit, not UnitCanAttack('player', unit), L["can be attacked by player"], explain) then
         return false
     end
-    if ExplainFalseUnitCondition(unit, UnitIsConnected(unit), "is not connected", explain) then
+    if ExplainFalseUnitCondition(unit, UnitIsConnected(unit), L["is not connected"], explain) then
         return false
     end
-    if ExplainFalseUnitCondition(unit, not UnitIsDeadOrGhost(unit), "is dead or ghost", explain) then
+    if ExplainFalseUnitCondition(unit, not UnitIsDeadOrGhost(unit), L["is dead or ghost"], explain) then
         return false
     end
-    if ExplainFalseUnitCondition(unit, UnitIsVisible(unit), "is not visible to client", explain) then
+    if ExplainFalseUnitCondition(unit, UnitIsVisible(unit), L["is not visible to client"], explain) then
         return false
     end
-    if ExplainFalseUnitCondition(unit, not IsBlacklisted(UnitFullName(unit)), 'is blacklisted', explain) then
+    if ExplainFalseUnitCondition(unit, not IsBlacklisted(UnitFullName(unit)), L['is blacklisted'], explain) then
         return false
     end
 
     local missing = PredictedHealthMissing(unit)
-    if ExplainFalseUnitCondition(unit, (missing >= self.db.char.FlatFromFull), UnitFullName(unit) .. ' not missing enough health ' .. missing, explain) then
+    if ExplainFalseUnitCondition(unit, (missing >= self.db.char.FlatFromFull), UnitFullName(unit) .. L[' not missing enough health '] .. missing, explain) then
         return false
     end
 
@@ -331,7 +316,7 @@ local function SelfPreservation()
     local missing = PredictedHealthMissing(healingTargetCandidate)
     if missing >= db.FlatForSelf or missing >= db.FlatFromFull
     then
-        sayd("********** Self Preservation **********");
+        sayd(L["********** Self Preservation **********"]);
         return healingTargetCandidate
     end
 end
@@ -344,7 +329,7 @@ local function RaidTargetPreservation()
         UnitHasHealthInfo(healingTargetCandidate) and
         minihealer:UnitIsHealable(healingTargetCandidate, true)
     then
-        sayd("********** Raid Target Priority **********");
+        sayd(L["********** Raid Target Priority **********"]);
         return healingTargetCandidate;
     end
 end
@@ -399,7 +384,7 @@ end
 
 local function RandomRaidTargetPreservation()
     local db = minihealer.db.char
-    sayd('implement me!')
+    sayd(L['implement me!'])
 end
 
 
@@ -482,17 +467,17 @@ function minihealer:UI_ERROR_MESSAGE(arg1)
 
     local errmsg = nil
 	if arg1 == SPELL_FAILED_LINE_OF_SIGHT then
-        errmsg = 'LOS '
+        errmsg = L['LOS ']
     elseif arg1 == ERR_SPELL_OUT_OF_RANGE
     or arg1 == SPELL_FAILED_OUT_OF_RANGE
     then
-        errmsg = 'OOR '
+        errmsg = L['OOR ']
     end
 
     if errmsg then
         lastBlacklistTime = GetTime();
         blacklist[UnitFullName(healingTarget)] = lastBlacklistTime + blacklistDuration
-        displayerr('blacklisted ' .. UnitFullName(healingTarget))
+        displayerr(L['blacklisted '] .. UnitFullName(healingTarget))
 	end
 end
 
@@ -529,7 +514,7 @@ end
 
 
 local function ResetHealbar()
-    minihealerHealbarText:SetText("no target")
+    minihealerHealbarText:SetText(L["no target"])
     minihealerHealbarStatusbar:SetValue(0)
     minihealerHealbarStatusbarPost:SetValue(0)
 end
@@ -581,10 +566,10 @@ function miniheal(healingTarget)
         healingTarget = FindWhoToHeal()
     end
     if not healingTarget then
-        display('nothing to heal')
+        display(L['nothing to heal'])
         return
     else
-        display('healing: ' .. UnitFullName(healingTarget))
+        display(L['healing: '] .. UnitFullName(healingTarget))
     end
 
     -- set healing target
