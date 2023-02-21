@@ -397,8 +397,8 @@ local function FindWhoToHeal()
     local db = minihealer.db.char
 
     healingTarget = nil
-    --healingTarget = SelfPreservation()
-    --if healingTarget then return healingTarget end
+    healingTarget = SelfPreservation()
+    if healingTarget then return healingTarget end
 
     healingTarget = RaidTargetPreservation()
     if healingTarget then return healingTarget end
