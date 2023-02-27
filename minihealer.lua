@@ -2,13 +2,12 @@
 minihealer = AceLibrary("AceAddon-2.0"):new("AceHook-2.1", "AceConsole-2.0", "AceDB-2.0", "AceEvent-2.0")
 minihealer:RegisterDB("minihealer_variables", "minihealer_variables_pc")
 minihealer:RegisterDefaults("char", {
-    ["RatioForSelf"] = 0.9, --less than this activates self preservation
-    ["RatioFull"] = 0.9, -- don't heal with too little missing
     ["FlatForSelf"] = 500,
     ["FlatFromFull"] = 500,
     -- ["FlatFromFull"] = -1,
     ["TargetPriority"] = false, -- prioritize focused target?
     ["HealthbarLocked"] = false, -- can we move the healthbar?
+    ["DebugOutput"] = false,
 })
 
 local L = AceLibrary("AceLocale-2.2"):new("MiniHealer")
@@ -20,7 +19,6 @@ local blacklistDuration = 5
 
 local healingTarget = nil
 local healingTargetMissing = 0
-local DEBUG_ENABLED = true
 local me = UnitName('player')
 local myclass = string.lower(UnitClass('player'))
 
@@ -65,7 +63,7 @@ end
 
 
 local function sayd(msg)
-    if not DEBUG_ENABLED then
+    if not minihealer.db.char.DebugOutput then
         return
     end
     minihealer:Print(colorize("@Y" .. msg))
@@ -114,6 +112,7 @@ local function print_usage()
     sayc(L['usage: '])
     sayc(L['minihealer lock - disable moving the healing bar'])
     sayc(L['minihealer unlock - enable moving the healing bar'])
+    sayc('minihealer toggledebug - enable or disable debug output')
 end
 
 
@@ -140,6 +139,13 @@ function minihealer:cmd(arg)
     elseif commandlist[1] == 'unlock' then
         self.db.char.HealthbarLocked = false
         sayc(L["Healthbar position unlocked"])
+    elseif commandlist[1] == 'toggledebug' then
+        self.db.char.DebugOutput = not self.db.char.DebugOutput
+        if self.db.char.DebugOutput then
+            sayc('debug output enabled')
+        else
+            sayc('debug output disabled')
+        end
     else
         sayc(L["unknown command"])
     end
@@ -233,13 +239,6 @@ local function UnitHasHealthInfo(unit)
 end
 
 
-
-local function PredictedHealthPercentage(healingTarget)
-    -- deprecated
-    return (UnitHealth(healingTarget) + libHealComm:getHeal(healingTarget)) / UnitHealthMax(healingTarget);
-end
-
-
 local function PredictedHealthMissing(healingTarget)
     return UnitHealthMax(healingTarget) - (UnitHealth(healingTarget) + GetIncomingHeals(healingTarget))
 end
@@ -312,8 +311,6 @@ local function SelfPreservation()
     -- if we aren't alive, we can't heal others
     local db = minihealer.db.char
     local healingTargetCandidate = 'player'
-    -- local percentage = PredictedHealthPercentage(healingTargetCandidate)
-    -- if (percentage < db.RatioForSelf) and (percentage < db.RatioFull) then
     local missing = PredictedHealthMissing(healingTargetCandidate)
     if missing >= db.FlatForSelf or missing >= db.FlatFromFull
     then
