@@ -150,6 +150,7 @@ function minihealer:OnEnable()
 
     assert(SmartHealer, L['dependency not found'])
     assert(pfUI.api.libpredict.UnitGetIncomingHeals, L['dependency not found'])
+    assert(pfUI.env.UnitCastingInfo, L['dependency not found'])
     assert(healspell, L['healspell for class '] .. myclass .. L[' not found'])
 
     self:RegisterEvent("UI_ERROR_MESSAGE")
@@ -391,12 +392,10 @@ end
 local function FindWhoToHeal()
     local playerIds = {};
     local petIds = {};
-    local i;
-    local AllPlayersAreFull = true;
-    local AllPetsAreFull = true;
     local db = minihealer.db.char
 
     healingTarget = nil
+
     healingTarget = SelfPreservation()
     if healingTarget then return healingTarget end
 
@@ -404,6 +403,7 @@ local function FindWhoToHeal()
     if healingTarget then return healingTarget end
 
     local playerIds, petIds = GatherHealableRaidMembers()
+
     for unit, i in playerIds do
         healingTarget = unit
         return healingTarget
@@ -560,6 +560,12 @@ end
 
 
 function miniheal(healingTarget)
+    local cast = pfUI.env.UnitCastingInfo(UnitName('player'))
+    if cast then
+        display('already casting ' .. cast)
+        return
+    end
+
     if healingTarget then
         healingTarget = string.lower(healingTarget)
     else
