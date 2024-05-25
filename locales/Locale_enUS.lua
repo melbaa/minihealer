@@ -12,14 +12,17 @@ L:RegisterTranslations("enUS", function()
 		-- SPELLS --
 		['Flash Heal'] = true,
 		['Flash of Light'] = true,
-		
+
 		--sayc
-		['usage: '] = true,
-		['minihealer lock - disable moving the healing bar'] = true,
-		['minihealer unlock - enable moving the healing bar'] = true,
+		['usage:'] = true,
+		['disable moving the healing bar'] = true,
+		['enable moving the healing bar'] = true,
+		['enable or disable debug output'] = true,
 
 		["Healthbar position locked"] = true,
 		["Healthbar position unlocked"] = true,
+		['debug output enabled'] = true,
+		['debug output disabled'] = true,
 		["unknown command"] = true,
 
 		["loaded"] = true,
@@ -43,17 +46,18 @@ L:RegisterTranslations("enUS", function()
 		["is dead or ghost"] = true,
 		["is not visible to client"] = true,
 		['is blacklisted'] = true,
-		[' not missing enough health '] = true,
+		['not missing enough health'] = true,
 
 		--errmsg
-		['LOS '] = true, --SPELL_FAILED_LINE_OF_SIGHT
-		['OOR '] = true, --SPELL_FAILED_OUT_OF_RANGE
+		['LOS'] = true, --SPELL_FAILED_LINE_OF_SIGHT
+		['OOR'] = true, --SPELL_FAILED_OUT_OF_RANGE
 		
-		['blacklisted '] = true, --displayerr
+		['blacklisted'] = true, --displayerr
 		["no target"] = true, --SetText
 
 		--display
+		['already casting'] = true,
 		['nothing to heal'] = true,
-		['healing: '] = true,
+		['healing:'] = true,
 	}
 end)
