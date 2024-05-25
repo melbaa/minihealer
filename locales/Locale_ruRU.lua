@@ -12,14 +12,17 @@ L:RegisterTranslations("ruRU", function()
 		-- SPELLS --
 		['Flash Heal'] = "Быстрое исцеление",
 		['Flash of Light'] = "Вспышка Света",
-		
+
 		--sayc
-		['usage: '] = "Применение: ",
-		['minihealer lock - disable moving the healing bar'] = "minihealer lock - отключить перемещение полосы исцеления",
-		['minihealer unlock - enable moving the healing bar'] = "minihealer unlock - включить перемещение полосы исцеления",
+		['usage:'] = "Применение:",
+		['disable moving the healing bar'] = "отключить перемещение полосы исцеления",
+		['enable moving the healing bar'] = "включить перемещение полосы исцеления",
+		['enable or disable debug output'] = "включить или отключить вывод отладки",
 
 		["Healthbar position locked"] = "Положение полосы здоровья заблокировано",
 		["Healthbar position unlocked"] = "Положение полосы здоровья разблокировано",
+		['debug output enabled'] = "Отладка включена",
+		['debug output disabled'] = "Отладка выключена",
 		["unknown command"] = "неизвестная команда",
 
 		["loaded"] = "загружен",
@@ -43,17 +46,18 @@ L:RegisterTranslations("ruRU", function()
 		["is dead or ghost"] = "мертв или призрак",
 		["is not visible to client"] = "не виден клиенту",
 		['is blacklisted'] = "занесен в черный список",
-		[' not missing enough health '] = " не хватает здоровья ",
+		['not missing enough health'] = "не хватает здоровья",
 
 		--errmsg
-		['LOS '] = "Вне поля зрения", --SPELL_FAILED_LINE_OF_SIGHT
-		['OOR '] = "Вне зоны диапазона", --SPELL_FAILED_OUT_OF_RANGE
+		['LOS'] = "Вне поля зрения", --SPELL_FAILED_LINE_OF_SIGHT
+		['OOR'] = "Вне зоны диапазона", --SPELL_FAILED_OUT_OF_RANGE
 		
-		['blacklisted '] = "занесен в черный список ", --displayerr
+		['blacklisted'] = "занесен в черный список", --displayerr
 		["no target"] = "нет цели", --SetText
 
 		--display
+		['already casting'] = "произношу заклинание",
 		['nothing to heal'] = "нечего лечить",
-		['healing: '] = "исцеление: ",
+		['healing:'] = "исцеление:",
 	}
 end)

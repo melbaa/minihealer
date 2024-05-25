@@ -20,11 +20,11 @@ local blacklistDuration = 5
 local healingTarget = nil
 local healingTargetMissing = 0
 local me = UnitName('player')
-local myclass = string.lower(UnitClass('player'))
+local locmyclass, myclass = UnitClass('player')
 
 local spell_per_class = {
-    priest = L['Flash Heal'],
-    paladin = L['Flash of Light'],
+    PRIEST = L['Flash Heal'],
+    PALADIN = L['Flash of Light'],
 }
 
 local healspell = spell_per_class[myclass]
@@ -109,10 +109,10 @@ end
 
 
 local function print_usage()
-    sayc(L['usage: '])
-    sayc(L['minihealer lock - disable moving the healing bar'])
-    sayc(L['minihealer unlock - enable moving the healing bar'])
-    sayc('minihealer toggledebug - enable or disable debug output')
+    sayc(L['usage:'] .. ' ')
+    sayc('minihealer lock - ' .. L['disable moving the healing bar'])
+    sayc('minihealer unlock - ' .. L['enable moving the healing bar'])
+    sayc('minihealer toggledebug - ' .. L['enable or disable debug output'])
 end
 
 
@@ -142,9 +142,9 @@ function minihealer:cmd(arg)
     elseif commandlist[1] == 'toggledebug' then
         self.db.char.DebugOutput = not self.db.char.DebugOutput
         if self.db.char.DebugOutput then
-            sayc('debug output enabled')
+            sayc(L['debug output enabled'])
         else
-            sayc('debug output disabled')
+            sayc(L['debug output disabled'])
         end
     else
         sayc(L["unknown command"])
@@ -157,7 +157,7 @@ function minihealer:OnEnable()
     assert(SmartHealer, L['dependency not found'])
     assert(pfUI.api.libpredict.UnitGetIncomingHeals, L['dependency not found'])
     assert(pfUI.env.UnitCastingInfo, L['dependency not found'])
-    assert(healspell, L['healspell for class '] .. myclass .. L[' not found'])
+    assert(healspell, L['healspell for class '] .. string.lower(locmyclass) .. L[' not found'])
 
     self:RegisterEvent("UI_ERROR_MESSAGE")
 
@@ -298,7 +298,7 @@ function minihealer:UnitIsHealable(unit, explain)
     end
 
     local missing = PredictedHealthMissing(unit)
-    if ExplainFalseUnitCondition(unit, (missing >= self.db.char.FlatFromFull), UnitFullName(unit) .. L[' not missing enough health '] .. missing, explain) then
+    if ExplainFalseUnitCondition(unit, (missing >= self.db.char.FlatFromFull), UnitFullName(unit) .. ' ' .. L['not missing enough health'] .. ' ' .. missing, explain) then
         return false
     end
 
@@ -464,17 +464,17 @@ function minihealer:UI_ERROR_MESSAGE(arg1)
 
     local errmsg = nil
 	if arg1 == SPELL_FAILED_LINE_OF_SIGHT then
-        errmsg = L['LOS ']
+        errmsg = L['LOS'] .. ' '
     elseif arg1 == ERR_SPELL_OUT_OF_RANGE
     or arg1 == SPELL_FAILED_OUT_OF_RANGE
     then
-        errmsg = L['OOR ']
+        errmsg = L['OOR'] .. ' '
     end
 
     if errmsg then
         lastBlacklistTime = GetTime();
         blacklist[UnitFullName(healingTarget)] = lastBlacklistTime + blacklistDuration
-        displayerr(L['blacklisted '] .. UnitFullName(healingTarget))
+        displayerr(L['blacklisted'] .. ' ' .. UnitFullName(healingTarget))
 	end
 end
 
@@ -559,7 +559,7 @@ end
 function miniheal(healingTarget)
     local cast = pfUI.env.UnitCastingInfo(UnitName('player'))
     if cast then
-        display('already casting ' .. cast)
+        display(L['already casting'] .. ' ' .. cast)
         return
     end
 
@@ -572,7 +572,7 @@ function miniheal(healingTarget)
         display(L['nothing to heal'])
         return
     else
-        display(L['healing: '] .. UnitFullName(healingTarget))
+        display(L['healing:'] .. ' ' .. UnitFullName(healingTarget))
     end
 
     -- set healing target
